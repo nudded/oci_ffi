@@ -1,11 +1,13 @@
 #![allow(non_camel_case_types, dead_code)]
 
-use libc::{c_int, c_ulong, c_ushort, c_void, size_t};
+use libc::{c_int, c_uint, c_uchar, c_ulong, c_ushort, c_void, size_t};
 
 // Add standard oracle types for more compliant external FFI description
-pub type ub4 = c_ulong;
+pub type ub4 = c_uint;
+pub type sb4 = c_int;
 pub type ub2 = c_ushort;
 pub type sword = c_int;
+pub type OraText = *mut c_uchar;
 
 /// Standard way for defining structs that have no fields in the external C library
 pub enum OCIEnv {}
@@ -25,6 +27,7 @@ pub enum OCIError {
     OCI_CONTINUE,
     OCI_ROWCBK_DONE,
 }
+
 
 /// use more natural conversions for converting enums to error_codes
 impl From<OCIError> for sword {
@@ -60,6 +63,38 @@ impl IntoOCIError for sword {
             -24200 => OCIError::OCI_CONTINUE,
             -24201 => OCIError::OCI_ROWCBK_DONE,
             _ => panic!("does not work!"),
+        }
+    }
+}
+
+/// all possible handle types
+pub enum OCIHandleType {
+    OCI_HTYPE_ENV,
+    OCI_HTYPE_ERROR,
+    OCI_HTYPE_SVCCTX,
+    OCI_HTYPE_STMT,
+    OCI_HTYPE_BIND,
+    OCI_HTYPE_DEFINE,
+    OCI_HTYPE_DESCRIBE,
+    OCI_HTYPE_SERVER,
+    OCI_HTYPE_SESSION,
+    OCI_HTYPE_TRANS,
+}
+
+/// use more natural conversions for converting enums to error_codes
+impl From<OCIHandleType> for ub4 {
+    fn from(handle_type: OCIHandleType) -> ub4 {
+        match handle_type {
+            OCIHandleType::OCI_HTYPE_ENV => 1,
+            OCIHandleType::OCI_HTYPE_ERROR => 2,
+            OCIHandleType::OCI_HTYPE_SVCCTX => 3,
+            OCIHandleType::OCI_HTYPE_STMT => 4,
+            OCIHandleType::OCI_HTYPE_BIND => 5,
+            OCIHandleType::OCI_HTYPE_DEFINE => 6,
+            OCIHandleType::OCI_HTYPE_DESCRIBE => 7,
+            OCIHandleType::OCI_HTYPE_SERVER => 8,
+            OCIHandleType::OCI_HTYPE_SESSION => 9,
+            OCIHandleType::OCI_HTYPE_TRANS => 10,
         }
     }
 }

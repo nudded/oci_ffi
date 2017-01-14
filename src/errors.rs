@@ -1,5 +1,7 @@
 use types::*;
 
+use std::ptr;
+
 /// Oracle error holder
 #[derive(Debug)]
 pub struct OracleError {
@@ -43,7 +45,7 @@ pub fn check_error(result_code: sword, handle: Option<*mut OCIHandle>, location:
 
 fn check_error_with_handle(handle: Option<*mut OCIHandle>, result_code: sword, default_msg: &str, location: &str) -> OracleError {
     if let Some(handle) = handle {
-        let msg = oci_get_error(handle);
+        let msg = oci_error_get(handle, location);
         OracleError::new(result_code, &*msg, location)
     } else {
         OracleError::new(result_code, default_msg, location)
@@ -51,7 +53,36 @@ fn check_error_with_handle(handle: Option<*mut OCIHandle>, result_code: sword, d
 
 }
 
-fn oci_get_error(handle: *mut OCIHandle) -> String {
-    "test".to_string()
+#[link(name = "clntsh")]
+extern "system" {
+
+    // get the error information out of the DB
+    fn OCIErrorGet(hndlp: *mut OCIHandle,
+                   recordno: ub4,
+                   sqlstate: OraText,
+                   errcodep: *mut sb4,
+                   bufp: OraText,
+                   bufsize: ub4,
+                   error_type: ub4) -> sword;
+
+}
+
+fn oci_error_get(handle: *mut OCIHandle, location: &str) -> OracleError {
+    let errcodep: *mut sword = &mut 0;
+    let mut bufp = String::with_capacity(512);
+    let mut error_code: sword;
+
+    let res = unsafe {
+        OCIErrorGet(handle,
+                    1,
+                    ptr::null_mut(),
+                    errcodep,
+                    mut bufp.as_ptr(),
+                    bufp.capacity(),
+                    OCIHandleType::OCI_HTYPE_ERROR.into());
+        error_code = *errcodep;
+    };
+
+    OracleError::new(error_code, &*bufp, location)
 }
 
