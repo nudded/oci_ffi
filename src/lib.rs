@@ -12,6 +12,19 @@ type sword = c_int;
 // Standard way for defining structs that have no fields in the external C library
 pub enum OCIEnv {}
 
+// all possible error codes as defined in the documentation
+pub enum OCIError {
+    OCI_SUCCESS = 0,
+    OCI_SUCCESS_WITH_INFO = 1,
+    OCI_NO_DATA = 100,
+    OCI_ERROR = -1,
+    OCI_INVALID_HANDLE = -2,
+    OCI_NEED_DATA = 99,
+    OCI_STILL_EXECUTING = -3123,
+    OCI_CONTINUE = -24200,
+    OCI_ROWCBK_DONE = -24201,
+}
+
 #[link(name = "clntsh")]
 extern "system" {
     fn OCIEnvCreate(envp: *mut *mut OCIEnv,
