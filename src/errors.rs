@@ -13,9 +13,9 @@ pub struct OracleError {
 
 impl OracleError {
 
-    pub fn new(code: OCIError, message: &str, location: &str) -> OracleError {
+    pub fn new(code: sword, message: &str, location: &str) -> OracleError {
         OracleError {
-            error_code: code as sword,
+            error_code: code,
             message: message.to_string(),
             error_location: location.to_string(),
         }
@@ -26,8 +26,8 @@ impl OracleError {
 pub type OracleResult<T> = Result<T, OracleError>;
 
 /// convenience function for converting errors and getting more information
-pub fn check_error(result_code: OCIError, handle: Option<*mut OCIHandle>, location: &str) -> Option<OracleError> {
-    match result_code {
+pub fn check_error(result_code: sword, handle: Option<*mut OCIHandle>, location: &str) -> Option<OracleError> {
+    match result_code.into_oci_error() {
         OCIError::OCI_SUCCESS => None,
         OCIError::OCI_SUCCESS_WITH_INFO => Some(check_error_with_handle(handle, result_code, "Success with info", location)),
         OCIError::OCI_NO_DATA => Some(OracleError::new(result_code, "No data", location)),
@@ -41,7 +41,7 @@ pub fn check_error(result_code: OCIError, handle: Option<*mut OCIHandle>, locati
     }
 }
 
-fn check_error_with_handle(handle: Option<*mut OCIHandle>, result_code: OCIError, default_msg: &str, location: &str) -> OracleError {
+fn check_error_with_handle(handle: Option<*mut OCIHandle>, result_code: sword, default_msg: &str, location: &str) -> OracleError {
     if let Some(handle) = handle {
         let msg = oci_get_error(handle);
         OracleError::new(result_code, &*msg, location)
