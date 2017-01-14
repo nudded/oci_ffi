@@ -4,17 +4,8 @@ use libc::{c_int, c_ulong, c_ushort, c_void, size_t};
 
 use std::ptr;
 
-mod enums;
-use enums::*;
-
-// Add standard oracle types for more compliant external FFI description
-#[allow(non_camel_case_types)]
-type ub4 = c_ulong;
-#[allow(non_camel_case_types)]
-type ub2 = c_ushort;
-#[allow(non_camel_case_types)]
-type sword = c_int;
-
+mod types;
+use types::*;
 
 #[link(name = "clntsh")]
 extern "system" {
@@ -68,8 +59,6 @@ extern "system" {
                        usrmempp: *mut *mut c_void,
                        charset: ub2,
                        ncharset: ub2) -> sword;
-
-
 }
 
 pub fn oci_env_nls_create(mode: OCIMode) -> *mut OCIEnv {

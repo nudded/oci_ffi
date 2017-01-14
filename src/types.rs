@@ -1,5 +1,10 @@
 #![allow(non_camel_case_types)]
 
+// Add standard oracle types for more compliant external FFI description
+type ub4 = c_ulong;
+type ub2 = c_ushort;
+type sword = c_int;
+
 // Standard way for defining structs that have no fields in the external C library
 pub enum OCIEnv {}
 
