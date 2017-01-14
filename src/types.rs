@@ -1,14 +1,19 @@
-#![allow(non_camel_case_types)]
+#![allow(non_camel_case_types, dead_code)]
+
+use libc::{c_int, c_ulong, c_ushort, c_void, size_t};
 
 // Add standard oracle types for more compliant external FFI description
-type ub4 = c_ulong;
-type ub2 = c_ushort;
-type sword = c_int;
+pub type ub4 = c_ulong;
+pub type ub2 = c_ushort;
+pub type sword = c_int;
 
-// Standard way for defining structs that have no fields in the external C library
+/// Standard way for defining structs that have no fields in the external C library
 pub enum OCIEnv {}
 
-// all possible error codes as defined in the documentation
+/// Oracle handle
+pub enum OCIHandle {}
+
+/// all possible error codes as defined in the documentation
 pub enum OCIError {
     OCI_SUCCESS = 0,
     OCI_SUCCESS_WITH_INFO = 1,
@@ -21,7 +26,7 @@ pub enum OCIError {
     OCI_ROWCBK_DONE = -24201,
 }
 
-// all possible modes as defined
+/// all possible modes as defined
 pub enum OCIMode {
     OCI_DEFAULT = 0,
     OCI_THREADED = 1,

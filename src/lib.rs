@@ -5,7 +5,9 @@ use libc::{c_int, c_ulong, c_ushort, c_void, size_t};
 use std::ptr;
 
 mod types;
+mod errors;
 use types::*;
+use errors::*;
 
 #[link(name = "clntsh")]
 extern "system" {
