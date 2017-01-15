@@ -66,22 +66,31 @@ extern "system" {
 
 }
 
+const ERROR_BUF_SIZE: usize = 512;
+
 fn oci_error_get(handle: *mut OCIHandle, location: &str) -> OracleError {
     let errcodep: *mut sword = &mut 0;
-    let mut bufp = String::with_capacity(512);
+    let mut bufp = Vec::with_capacity(ERROR_BUF_SIZE);
     let mut error_code: sword;
+    let mut message = String::from("Error could not be read!");
 
     let res = unsafe {
         OCIErrorGet(handle,
                     1,
                     ptr::null_mut(),
                     errcodep,
-                    bufp.as_ptr() as OraText,
+                    bufp.as_mut_ptr() as OraText,
                     bufp.capacity() as ub4,
                     OCIHandleType::OCI_HTYPE_ERROR.into());
+        // this deref is safe
         error_code = *errcodep;
-    };
 
-    OracleError::new(error_code, &*bufp, location)
+        // this code is taken from
+        // https://github.com/rust-lang/rust/blob/master/src/libstd/sys/unix/os.rs#L106
+        if let Ok(string) = CString::from_vec_unchecked(bufp).into_string() {
+            message = string
+        }
+    };
+    OracleError::new(error_code, &*message, location)
 }
 
