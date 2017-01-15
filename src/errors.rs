@@ -1,6 +1,7 @@
 use types::*;
 
 use std::ptr;
+use std::ffi::CString;
 
 /// Oracle error holder
 #[derive(Debug)]
@@ -45,12 +46,10 @@ pub fn check_error(result_code: sword, handle: Option<*mut OCIHandle>, location:
 
 fn check_error_with_handle(handle: Option<*mut OCIHandle>, result_code: sword, default_msg: &str, location: &str) -> OracleError {
     if let Some(handle) = handle {
-        let msg = oci_error_get(handle, location);
-        OracleError::new(result_code, &*msg, location)
+        oci_error_get(handle, location)
     } else {
         OracleError::new(result_code, default_msg, location)
     }
-
 }
 
 #[link(name = "clntsh")]
@@ -77,8 +76,8 @@ fn oci_error_get(handle: *mut OCIHandle, location: &str) -> OracleError {
                     1,
                     ptr::null_mut(),
                     errcodep,
-                    mut bufp.as_ptr(),
-                    bufp.capacity(),
+                    bufp.as_ptr() as OraText,
+                    bufp.capacity() as ub4,
                     OCIHandleType::OCI_HTYPE_ERROR.into());
         error_code = *errcodep;
     };
