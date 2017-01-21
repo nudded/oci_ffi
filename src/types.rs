@@ -1,19 +1,22 @@
 #![allow(non_camel_case_types, dead_code)]
 
-use libc::{c_int, c_uint, c_uchar, c_ulong, c_ushort, c_void, size_t};
+use libc::{c_int, c_uint, c_uchar, c_ushort};
 
 // Add standard oracle types for more compliant external FFI description
 pub type ub4 = c_uint;
 pub type sb4 = c_int;
 pub type ub2 = c_ushort;
 pub type sword = c_int;
-pub type OraText = *mut c_uchar;
+pub type OraText = c_uchar;
 
 /// Standard way for defining structs that have no fields in the external C library
 pub enum OCIEnv {}
 
 /// Oracle handle
 pub enum OCIHandle {}
+
+/// Oracle service context
+pub enum OCISrvCtx {}
 
 /// all possible error codes as defined in the documentation
 pub enum OCIError {

@@ -90,7 +90,7 @@ extern "system" {
     // get the error information out of the DB
     fn OCIErrorGet(hndlp: *mut OCIHandle,
                    recordno: ub4,
-                   sqlstate: OraText,
+                   sqlstate: *mut OraText,
                    errcodep: *mut sb4,
                    bufp: OraText,
                    bufsize: ub4,

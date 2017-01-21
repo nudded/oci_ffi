@@ -1,5 +1,7 @@
 extern crate libc;
 
+// don't know why it complains about unused imports here, without these it cannot compile
+#[allow(unused_imports)]
 use libc::{c_int, c_ulong, c_ushort, c_void, size_t};
 
 use std::ptr;
@@ -90,7 +92,7 @@ pub fn oci_env_nls_create(mode: OCIMode) -> OracleResult<*mut OCIEnv> {
 #[link(name = "clntsh")]
 extern "system" {
     /* create the OCIEnv handle with charset options */
-    fn OCIHandleAlloc(parenth: *const OCIEnv,
+    fn OCIHandleAlloc(parenth: *const c_void,
                       hndlpp: *mut *mut OCIHandle,
                       htype: ub4,
                       xtramem_sz: size_t,
@@ -105,7 +107,7 @@ pub fn oci_handle_alloc(oci_env: *mut OCIEnv,
 
     let mut handle = ptr::null_mut();
     let res = unsafe {
-        OCIHandleAlloc(oci_env as *const OCIEnv,
+        OCIHandleAlloc(oci_env as *const _,
                        &mut handle,
                        htype.into(),
                        0,
@@ -114,4 +116,45 @@ pub fn oci_handle_alloc(oci_env: *mut OCIEnv,
 
     check_error!(res, handle)
 
+}
+
+#[link(name = "clntsh")]
+extern "system" {
+    /* create the OCIEnv handle with charset options */
+    fn OCILogon2(envhp: *mut OCIEnv,
+                 errhp: *mut OCIHandle,
+                 svchp: *mut *mut OCISrvCtx,
+                 username: *const OraText,
+                 uname_len: ub4,
+                 password: *const OraText,
+                 passwd_len: ub4,
+                 dbname: *const OraText,
+                 dbname_len: ub4,
+                 mode: ub4)
+                 -> sword;
+}
+
+pub fn oci_logon2(env: *mut OCIEnv,
+                  error_handle: *mut OCIHandle,
+                  username: &str,
+                  password: &str,
+                  dbname: &str,
+                  mode: ub4)
+                  -> OracleResult<*mut OCISrvCtx> {
+
+    let mut srvctx = ptr::null_mut();
+
+    let res = unsafe {
+        OCILogon2(env,
+                  error_handle,
+                  &mut srvctx,
+                  username.as_ptr(),
+                  username.len() as ub4,
+                  password.as_ptr(),
+                  password.len() as ub4,
+                  dbname.as_ptr(),
+                  dbname.len() as ub4,
+                  mode)
+    };
+    check_error!(res, srvctx, error_handle)
 }
