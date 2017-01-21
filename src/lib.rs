@@ -86,3 +86,30 @@ pub fn oci_env_nls_create(mode: OCIMode) -> OracleResult<*mut OCIEnv> {
     };
     check_error!(res, oci_env)
 }
+
+#[link(name = "clntsh")]
+extern "system" {
+    /* create the OCIEnv handle with charset options */
+    fn OCIHandleAlloc(parenth: *const OCIEnv,
+                      hndlpp: *mut *mut OCIHandle,
+                      htype: ub4,
+                      xtramem_sz: size_t,
+                      usrmempp: *mut *mut c_void)
+                      -> sword;
+}
+
+/// Allocates handles under the given environment
+pub fn oci_handle_alloc(oci_env: *mut OCIEnv, htype: ub4) -> OracleResult<*mut OCIHandle> {
+
+    let mut handle = ptr::null_mut();
+    let res = unsafe {
+        OCIHandleAlloc(oci_env as *const OCIEnv,
+                       &mut handle,
+                       htype,
+                       0,
+                       ptr::null_mut())
+    };
+
+    check_error!(res, handle)
+
+}
