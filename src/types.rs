@@ -28,6 +28,30 @@ pub enum OCIError {
     OCI_ROWCBK_DONE,
 }
 
+/// Possible handle types
+pub enum OCIHandleType {
+    OCI_HTYPE_ENV,
+    OCI_HTYPE_ERROR,
+    OCI_HTYPE_SVCCTX,
+    OCI_HTYPE_STMT,
+    OCI_HTYPE_BIND,
+    OCI_HTYPE_DEFINE,
+    OCI_HTYPE_DESCRIBE,
+    OCI_HTYPE_SERVER,
+    OCI_HTYPE_SESSION,
+    OCI_HTYPE_AUTHINFO,
+    OCI_HTYPE_CPOOL,
+    OCI_HTYPE_SPOOL,
+    OCI_HTYPE_TRANS,
+    OCI_HTYPE_COMPLEXOBJECT,
+    OCI_HTYPE_SUBSCRIPTION,
+    OCI_HTYPE_DIRPATH_CTX,
+    OCI_HTYPE_DIRPATH_FN_CTX,
+    OCI_HTYPE_DIRPATH_COLUMN_ARRAY,
+    OCI_HTYPE_DIRPATH_STREAM,
+    OCI_HTYPE_PROC,
+    OCI_HTYPE_ADMIN,
+}
 
 /// use more natural conversions for converting enums to error_codes
 impl From<OCIError> for sword {
@@ -67,20 +91,6 @@ impl IntoOCIError for sword {
     }
 }
 
-/// all possible handle types
-pub enum OCIHandleType {
-    OCI_HTYPE_ENV,
-    OCI_HTYPE_ERROR,
-    OCI_HTYPE_SVCCTX,
-    OCI_HTYPE_STMT,
-    OCI_HTYPE_BIND,
-    OCI_HTYPE_DEFINE,
-    OCI_HTYPE_DESCRIBE,
-    OCI_HTYPE_SERVER,
-    OCI_HTYPE_SESSION,
-    OCI_HTYPE_TRANS,
-}
-
 /// use more natural conversions for converting enums to error_codes
 impl From<OCIHandleType> for ub4 {
     fn from(handle_type: OCIHandleType) -> ub4 {
@@ -95,6 +105,9 @@ impl From<OCIHandleType> for ub4 {
             OCIHandleType::OCI_HTYPE_SERVER => 8,
             OCIHandleType::OCI_HTYPE_SESSION => 9,
             OCIHandleType::OCI_HTYPE_TRANS => 10,
+            OCIHandleType::OCI_HTYPE_COMPLEXOBJECT => 11,
+            OCIHandleType::OCI_HTYPE_SUBSCRIPTION => 13,
+            _ => 1000, // @todo!
         }
     }
 }

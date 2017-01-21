@@ -99,13 +99,15 @@ extern "system" {
 }
 
 /// Allocates handles under the given environment
-pub fn oci_handle_alloc(oci_env: *mut OCIEnv, htype: ub4) -> OracleResult<*mut OCIHandle> {
+pub fn oci_handle_alloc(oci_env: *mut OCIEnv,
+                        htype: OCIHandleType)
+                        -> OracleResult<*mut OCIHandle> {
 
     let mut handle = ptr::null_mut();
     let res = unsafe {
         OCIHandleAlloc(oci_env as *const OCIEnv,
                        &mut handle,
-                       htype,
+                       htype.into(),
                        0,
                        ptr::null_mut())
     };
