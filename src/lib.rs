@@ -91,7 +91,7 @@ pub fn oci_env_nls_create(mode: OCIMode) -> OracleResult<*mut OCIEnv> {
 
 #[link(name = "clntsh")]
 extern "system" {
-    /* create the OCIEnv handle with charset options */
+    /* initialize handles */
     fn OCIHandleAlloc(parenth: *const c_void,
                       hndlpp: *mut *mut OCIHandle,
                       htype: ub4,
@@ -120,7 +120,6 @@ pub fn oci_handle_alloc(oci_env: *mut OCIEnv,
 
 #[link(name = "clntsh")]
 extern "system" {
-    /* create the OCIEnv handle with charset options */
     fn OCILogon2(envhp: *mut OCIEnv,
                  errhp: *mut OCIHandle,
                  svchp: *mut *mut OCISrvCtx,
