@@ -131,6 +131,7 @@ pub fn oci_handle_free(handle: *mut OCIHandle, handle_type: OCIHandleType) -> Or
     check_error!(res, ())
 }
 
+
 #[link(name = "clntsh")]
 extern "system" {
     fn OCILogon2(envhp: *mut OCIEnv,
@@ -146,6 +147,7 @@ extern "system" {
                  -> sword;
 }
 
+/// Logon which creates the service context for us
 pub fn oci_logon2(env: *mut OCIEnv,
                   error_handle: *mut OCIHandle,
                   username: &str,
@@ -169,4 +171,31 @@ pub fn oci_logon2(env: *mut OCIEnv,
                   mode)
     };
     check_error!(res, srvctx, error_handle)
+}
+
+
+#[link(name = "clntsh")]
+extern "system" {
+    fn OCIStmtPrepare2(svchp: *mut OCISrvCtx,
+                       stmthp: *mut *mut OCIStmt, // this is the result
+                       errhp: *mut OCIHandle,
+                       stmttext: *const OraText, // should be NULL-terminated!
+                       stmt_len: ub4,
+                       key: *const OraText,
+                       keylen: ub4,
+                       language: ub4,
+                       mode: ub4)
+                       -> sword;
+}
+
+/// prepare statements, returning a statement handle
+pub fn oci_stmt_prepare2(srv_ctx: *mut OCISrvCtx,
+                         error_handle: *mut OCIHandle,
+                         stmt: &str)
+                         -> OracleResult<*mut OCIStmt> {
+
+    let stmt = ptr::null_mut();
+    // @TODO: add more parameters, use cstring
+    let res = unsafe { OCIStmtPrepare2(srv_ctx, &mut stmt, error_handle) };
+    check_error!(res, stmt, error_handle)
 }

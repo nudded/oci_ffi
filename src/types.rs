@@ -18,6 +18,9 @@ pub enum OCIHandle {}
 /// Oracle service context
 pub enum OCISrvCtx {}
 
+/// Oracle stmt handle
+pub enum OCIStmt {}
+
 /// all possible error codes as defined in the documentation
 pub enum OCIError {
     OCI_SUCCESS,
