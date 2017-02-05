@@ -118,6 +118,19 @@ pub fn oci_handle_alloc(oci_env: *mut OCIEnv,
 
 }
 
+
+#[link(name = "clntsh")]
+extern "system" {
+    fn OCIHandleFree(hndlp: *mut c_void, htype: ub4) -> sword;
+}
+
+/// Free handles
+pub fn oci_handle_free(handle: *mut OCIHandle, handle_type: OCIHandleType) -> OracleResult<()> {
+
+    let res = unsafe { OCIHandleFree(handle as *mut c_void, handle_type.into()) };
+    check_error!(res, ())
+}
+
 #[link(name = "clntsh")]
 extern "system" {
     fn OCILogon2(envhp: *mut OCIEnv,
